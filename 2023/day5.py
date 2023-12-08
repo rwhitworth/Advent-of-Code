@@ -32,7 +32,7 @@ block = ''
 
 for input in f:
   input = input.replace("\n", '')
-  print(f'input: {input}')
+  # print(f'input: {input}')
 
   if len(input) < 3:
     continue
@@ -48,59 +48,99 @@ for input in f:
 
   if block == 'seed-to-soil map':
     r = re.search('([0-9]{1,10}) ([0-9]{1,10}) ([0-9]{1,10})', input)
-    for i in range(0, int(r.group(3))):
-      seed_to_soil[int(r.group(2)) + i] = int(r.group(1)) + i
+    dst = r.group(1)
+    src = r.group(2)
+    count = r.group(3)
+    seed_to_soil[dst] = [src, dst, count]
 
   if block == 'soil-to-fertilizer map':
     r = re.search('([0-9]{1,10}) ([0-9]{1,10}) ([0-9]{1,10})', input)
-    for i in range(0, int(r.group(3))):
-      soil_to_fert[int(r.group(2)) + i] = int(r.group(1)) + i
+    dst = r.group(1)
+    src = r.group(2)
+    count = r.group(3)
+    soil_to_fert[dst] = [src, dst, count]
 
   if block == 'fertilizer-to-water map':
     r = re.search('([0-9]{1,10}) ([0-9]{1,10}) ([0-9]{1,10})', input)
-    for i in range(0, int(r.group(3))):
-      fert_to_water[int(r.group(2)) + i] = int(r.group(1)) + i
+    dst = r.group(1)
+    src = r.group(2)
+    count = r.group(3)
+    fert_to_water[dst] = [src, dst, count]
 
   if block == 'water-to-light map':
     r = re.search('([0-9]{1,10}) ([0-9]{1,10}) ([0-9]{1,10})', input)
-    for i in range(0, int(r.group(3))):
-      water_to_light[int(r.group(2)) + i] = int(r.group(1)) + i
+    dst = r.group(1)
+    src = r.group(2)
+    count = r.group(3)
+    water_to_light[dst] = [src, dst, count]
 
   if block == 'light-to-temperature map':
     r = re.search('([0-9]{1,10}) ([0-9]{1,10}) ([0-9]{1,10})', input)
-    for i in range(0, int(r.group(3))):
-      light_to_temp[int(r.group(2)) + i] = int(r.group(1)) + i
+    dst = r.group(1)
+    src = r.group(2)
+    count = r.group(3)
+    light_to_temp[dst] = [src, dst, count]
 
   if block == 'temperature-to-humidity map':
     r = re.search('([0-9]{1,10}) ([0-9]{1,10}) ([0-9]{1,10})', input)
-    for i in range(0, int(r.group(3))):
-      temp_to_hum[int(r.group(2)) + i] = int(r.group(1)) + i
+    dst = r.group(1)
+    src = r.group(2)
+    count = r.group(3)
+    temp_to_hum[dst] = [src, dst, count]
 
   if block == 'humidity-to-location map':
     r = re.search('([0-9]{1,10}) ([0-9]{1,10}) ([0-9]{1,10})', input)
-    for i in range(0, int(r.group(3))):
-      hum_to_loc[int(r.group(2)) + i] = int(r.group(1)) + i      
+    dst = r.group(1)
+    src = r.group(2)
+    count = r.group(3)
+    hum_to_loc[dst] = [src, dst, count]
 
-for i in seeds:
-  temp = int(i)
+def map_it(map, val):
+  for item in map:
+    item = map[item]
+    if DEBUG: print(f'{item}')
+    if val >= int(item[0]):
+      if val <= (int(item[0]) + int(item[2])):
+        return val - int(item[0]) + int(item[1])
+  return val
 
-  if temp in seed_to_soil:
-    temp = seed_to_soil[temp]
-  if temp in soil_to_fert:
-    temp = soil_to_fert[temp]
-  if temp in fert_to_water:
-    temp = fert_to_water[temp]
-  if temp in water_to_light:
-    temp = water_to_light[temp]
-  if temp in light_to_temp:
-    temp = light_to_temp[temp]
-  if temp in temp_to_hum:
-    temp = temp_to_hum[temp]
-  if temp in hum_to_loc:
-    temp = hum_to_loc[temp]
+for seed in seeds:
+  temp = int(seed)
+
+  if DEBUG: print(f'temp: {temp}')
+  temp = map_it(seed_to_soil, temp)
+  if DEBUG: print(f'temp: {temp}')
+  temp = map_it(soil_to_fert, temp)
+  if DEBUG: print(f'temp: {temp}')
+  temp = map_it(fert_to_water, temp)
+  if DEBUG: print(f'temp: {temp}')
+  temp = map_it(water_to_light, temp)
+  if DEBUG: print(f'temp: {temp}')
+  temp = map_it(light_to_temp, temp)
+  if DEBUG: print(f'temp: {temp}')
+  temp = map_it(temp_to_hum, temp)
+  if DEBUG: print(f'temp: {temp}')
+  temp = map_it(hum_to_loc, temp)
+  if DEBUG: print(f'temp: {temp}')
+
+#   if temp in seed_to_soil:
+#     temp = seed_to_soil[temp]
+#   if temp in soil_to_fert:
+#     temp = soil_to_fert[temp]
+#   if temp in fert_to_water:
+#     temp = fert_to_water[temp]
+#   if temp in water_to_light:
+#     temp = water_to_light[temp]
+#   if temp in light_to_temp:
+#     temp = light_to_temp[temp]
+#   if temp in temp_to_hum:
+#     temp = temp_to_hum[temp]
+#   if temp in hum_to_loc:
+#     temp = hum_to_loc[temp]
 
   if temp < result:
     result = temp
-  continue
+  
+  if DEBUG: print(f'seed: {seed} - temp: {temp} - result: {result}')
 
 print(f"result: {result}")
